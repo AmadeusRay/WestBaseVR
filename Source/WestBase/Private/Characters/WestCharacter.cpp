@@ -11,6 +11,7 @@
 AWestCharacter::AWestCharacter()
 {
 	Statline = CreateDefaultSubobject<UWStatlineComponent>(TEXT("Statline"));
+	Statline->SetMoveCompRef(GetCharacterMovement());
 	
 	SelectionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Selection Box"));
 	SelectionBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("hand_r"));
@@ -19,7 +20,6 @@ AWestCharacter::AWestCharacter()
 	SelectionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Ignore);// specifically sets
 	//Pawn ones to ignore. Easier than individually doing it.
 	
-
 	SelectTraceStart =  CreateDefaultSubobject<USceneComponent>(TEXT("Select Trace Start"));
 	SelectTraceStart->SetupAttachment(SelectionBox);
 	

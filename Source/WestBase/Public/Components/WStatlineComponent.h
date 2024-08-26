@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "WStatlineComponent.generated.h"
 
 UENUM(BlueprintType)
@@ -73,51 +74,52 @@ class WESTBASE_API UWStatlineComponent : public UActorComponent
 	GENERATED_BODY()
 
 private:
+
+	class UCharacterMovementComponent* owningCharMoveComp;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Health;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Stamina;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Hunger = FCoreStat (100,100, -.25);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Thirst = FCoreStat(100, 100, -0.25);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bIsSprinting = false;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float SpringCostMultiplier = 2;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float JumpCost = 10;
+	float sprintCostMultiplier = 2;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float walkSpeed = 125;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float sprintSpeed = 450;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float jumpCost = 10;
 
 	void TickStats(const float& DeltaTime);
-	
-	//Health
-	// Current Value
-	// Max Value
-	// Regent Rate (Body parts have health bars)
-	// float currentHealth
-	// float MaxHealth
-	// float HealthPerSecondTick
-	
-	//Stamina
-	//Mana
-	//Hunger/
-	//Thirst
-	//Energy
-
-public:	
-	// Sets default values for this component's properties
-	UWStatlineComponent();
+	void TickStamina(const float& DeltaTime);
+	bool IsValidSprinting();
 
 protected:
-	// Called when the game starts
+
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+public:
+	UWStatlineComponent();
+	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetMoveCompRef(UCharacterMovementComponent* Comp);
+	
 	UFUNCTION(BlueprintCallable)
 	float getStatPercentile(const ECoreStat Stat) const;
 
