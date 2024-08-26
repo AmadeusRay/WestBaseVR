@@ -39,8 +39,26 @@ void AWestCharacter::BeginPlay()
 	SelectionBox->OnComponentBeginOverlap.AddDynamic(this, &AWestCharacter::OnSelectBoxOverlap);
 }
 
+void AWestCharacter::PlayerJump()
+{
+	if(CanJump())
+	{
+		HasJumped();
+	}
+}
+
+bool AWestCharacter::CanJump() const
+{
+	return Statline->canJump();
+}
+
+void AWestCharacter::HasJumped()
+{
+	Statline->hasJumped();
+}
+
 void AWestCharacter::OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	const FVector Start = SelectTraceStart->GetComponentLocation();
 	const FVector End = SelectTraceEnd->GetComponentLocation();
