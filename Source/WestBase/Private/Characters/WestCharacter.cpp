@@ -2,11 +2,15 @@
 
 
 #include "Characters/WestCharacter.h"
+
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Components/WStatlineComponent.h"
 #include "Components/BoxComponent.h"
 #include "Items/Item.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+// This is for ALL the characters. NPCS, monsters, to leverage the same functionality as the player.
 
 AWestCharacter::AWestCharacter()
 {
@@ -37,6 +41,17 @@ void AWestCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	SelectionBox->OnComponentBeginOverlap.AddDynamic(this, &AWestCharacter::OnSelectBoxOverlap);
+
+	//
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+	//
+	
 }
 
 void AWestCharacter::PlayerJump()
@@ -55,6 +70,44 @@ bool AWestCharacter::CanJump() const
 void AWestCharacter::HasJumped()
 {
 	Statline->hasJumped();
+}
+
+void AWestCharacter::Move(const FInputActionValue& Value)
+{
+	// input is a Vector2D
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// add movement 
+		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+		AddMovementInput(GetActorRightVector(), MovementVector.X);
+	}
+}
+
+void AWestCharacter::Look(const FInputActionValue& Value)
+{
+	// input is a Vector2D
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// add yaw and pitch input to controller
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AWestCharacter::Interact()
+{
+	//bPressedInteract = true;
+	//InteractKeyHoldTime = 0.0f;
+}
+
+void AWestCharacter::StopInteract()
+{
+	//bPressedInteract = false;
+	//ResetInteractstate(0);
 }
 
 void AWestCharacter::OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -81,11 +134,6 @@ void AWestCharacter::OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent
 		}
 	}
 }
-
-void AWestCharacter::InteractPressed()
-{
-}
-
 
 /*
 void AWestCharacter::TraceForward_Implementation()
@@ -129,10 +177,28 @@ void AWestCharacter::Tick(float DeltaTime)
 
 
 // Called to bind functionality to input
-void AWestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AWestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)  // needs to be in player character
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AWestCharacter::InteractPressed);
+	//PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AWestCharacter::InteractPressed);
+
+	// Set up action bindings
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		//Jumping
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		
+		//Moving
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AWestCharacter::Move);
+
+		//Looking
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWestCharacter::Look);
+
+		//Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWestCharacter::Interact);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AWestCharacter::Interact);
+	}
 }
 

@@ -9,6 +9,9 @@
 
 class AItem;
 class UBoxComponent;
+//
+class UInputComponent;
+//
 
 UCLASS()
 class WESTBASE_API AWestCharacter : public ACharacter
@@ -32,6 +35,32 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Selection Properties")
 	UBoxComponent* SelectionBox;
 	
+	//
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputMappingContext* DefaultMappingContext;
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* JumpAction;
+
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* MoveAction;
+
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* LookAction;
+
+	/** Interaction Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* InteractAction;
+
+	/** Interaction Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* StopInteractAction;
+	//
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -39,11 +68,22 @@ protected:
 	bool CanJump() const;
 	void HasJumped();
 
-	UFUNCTION()
-	void OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	//
+	/** Called for movement input */
+	void Move(const FInputActionValue& Value);
+
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
+
+	/** Called for interact input */
+	UFUNCTION(BlueprintCallable)
+	void Interact();
 
 	UFUNCTION(BlueprintCallable)
-	void InteractPressed();
+	void StopInteract();
+	
+	UFUNCTION()
+	void OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UPROPERTY(BlueprintReadOnly, Category="Interaction")
 	USceneComponent* SelectTraceStart;
@@ -58,12 +98,10 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void TraceForward();
 	void TraceForward_Implementation();
-*/
-	
+	*/
 	
 private:
 	UPROPERTY(VisibleInstanceOnly, Category = "Selection Properties")
-	AItem* OverlappingItem;
-	
+	AItem* OverlappingItem
 
 };
