@@ -3,8 +3,8 @@
 
 #include "Characters/WestCharacter.h"
 
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
+
+
 #include "Components/WStatlineComponent.h"
 #include "Components/BoxComponent.h"
 #include "Items/Item.h"
@@ -16,7 +16,8 @@ AWestCharacter::AWestCharacter()
 {
 	Statline = CreateDefaultSubobject<UWStatlineComponent>(TEXT("Statline"));
 	Statline->SetMoveCompRef(GetCharacterMovement());
-	
+
+	/*
 	SelectionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Selection Box"));
 	SelectionBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("hand_r"));
 	SelectionBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -29,7 +30,8 @@ AWestCharacter::AWestCharacter()
 	
 	SelectTraceEnd =  CreateDefaultSubobject<USceneComponent>(TEXT("Select Trace End"));
 	SelectTraceEnd->SetupAttachment(SelectionBox);
-
+*/
+	
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -40,76 +42,32 @@ void AWestCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SelectionBox->OnComponentBeginOverlap.AddDynamic(this, &AWestCharacter::OnSelectBoxOverlap);
-
-	//
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
-	//
-	
+	//SelectionBox->OnComponentBeginOverlap.AddDynamic(this, &AWestCharacter::OnSelectBoxOverlap);
 }
 
-void AWestCharacter::PlayerJump()
-{
-	if(CanJump())
-	{
-		HasJumped();
-	}
-}
 
-bool AWestCharacter::CanJump() const
+bool AWestCharacter::canJump() const
 {
 	return Statline->canJump();
 }
 
-void AWestCharacter::HasJumped()
+void AWestCharacter::hasJumped()
 {
 	Statline->hasJumped();
+	ACharacter::Jump();
 }
 
-void AWestCharacter::Move(const FInputActionValue& Value)
+bool AWestCharacter::canSprint() const
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// add movement 
-		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
-	}
+	return Statline->canSprint();
 }
 
-void AWestCharacter::Look(const FInputActionValue& Value)
+void AWestCharacter::setSprinting(const bool& IsSprinting)
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
+	Statline->setSprinting(IsSprinting);
 }
 
-void AWestCharacter::Interact()
-{
-	//bPressedInteract = true;
-	//InteractKeyHoldTime = 0.0f;
-}
-
-void AWestCharacter::StopInteract()
-{
-	//bPressedInteract = false;
-	//ResetInteractstate(0);
-}
-
+/*
 void AWestCharacter::OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -135,7 +93,6 @@ void AWestCharacter::OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent
 	}
 }
 
-/*
 void AWestCharacter::TraceForward_Implementation()
 {
 	FVector Loc;
@@ -176,29 +133,5 @@ void AWestCharacter::Tick(float DeltaTime)
 
 
 
-// Called to bind functionality to input
-void AWestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)  // needs to be in player character
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	//PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AWestCharacter::InteractPressed);
-
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AWestCharacter::Move);
-
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWestCharacter::Look);
-
-		//Interact
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWestCharacter::Interact);
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AWestCharacter::Interact);
-	}
-}
 

@@ -40,8 +40,8 @@ void AItem::BeginPlay()
 		PickupWidget->SetVisibility(false);
 	}
 
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
-	Sphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
+	//Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
+	//Sphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
 }
 
 float AItem::TransformedSin()
@@ -58,6 +58,8 @@ void AItem::RotateItem(float DeltaTime, float RateSpeed)
 {
 	AddActorLocalRotation(FRotator(0, RateSpeed*DeltaTime, 0));
 }
+
+/*
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -101,6 +103,7 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent,
 		}
 	}
 }
+*/
 
 void AItem::Tick(float DeltaTime)
 {

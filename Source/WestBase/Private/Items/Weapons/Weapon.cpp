@@ -7,7 +7,7 @@
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
 {
 }
-
+/*
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -28,3 +28,4 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 	// Check if traced, used message on screen or unhighlight weapon.
 }
+*/

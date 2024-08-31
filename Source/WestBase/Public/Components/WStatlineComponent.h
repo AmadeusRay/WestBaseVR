@@ -104,6 +104,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float jumpCost = 10;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float secondsStaminaExhaustion = 5;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float currentStaminaExhaustion = 0;
+
 	void TickStats(const float& DeltaTime);
 	void TickStamina(const float& DeltaTime);
 	bool IsValidSprinting();

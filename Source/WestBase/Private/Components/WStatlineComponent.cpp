@@ -13,11 +13,24 @@ void UWStatlineComponent::TickStats(const float& DeltaTime)
 
 void UWStatlineComponent::TickStamina(const float& DeltaTime)
 {
-	if(bIsSprinting&&IsValidSprinting())
+	if(currentStaminaExhaustion > 0.0)
 	{
-	Stamina.TickStat(0-(DeltaTime*sprintCostMultiplier));
+		currentStaminaExhaustion-=DeltaTime;
 		return;
 	}
+	
+	if(bIsSprinting&&IsValidSprinting())
+	{
+		Stamina.TickStat(0-(DeltaTime*sprintCostMultiplier));
+		if(Stamina.GetCurrent() <= 0.0)
+		{
+			setSprinting(false);
+			currentStaminaExhaustion = secondsStaminaExhaustion;
+			
+		}
+		return;
+	}
+
 	Stamina.TickStat(DeltaTime);
 }
 
@@ -39,6 +52,7 @@ UWStatlineComponent::UWStatlineComponent()
 void UWStatlineComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	owningCharMoveComp->MaxWalkSpeed = walkSpeed;
 }
 
 
