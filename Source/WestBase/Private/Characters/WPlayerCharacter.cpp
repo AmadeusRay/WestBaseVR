@@ -91,6 +91,16 @@ void AWPlayerCharacter::sprintOff()
 	setSprinting(false);
 }
 
+void AWPlayerCharacter::sneakOn()
+{
+	SetSneaking(true);
+}
+
+void AWPlayerCharacter::sneakOff()
+{
+	SetSneaking(false);
+}
+
 void AWPlayerCharacter::Interact()
 {
 	//bPressedInteract = true; // not yet done
@@ -120,6 +130,8 @@ void AWPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWPlayerCharacter::Look);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AWPlayerCharacter::sprintOn);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AWPlayerCharacter::sprintOff);
+		EnhancedInputComponent->BindAction(SneakAction, ETriggerEvent::Started, this, &AWPlayerCharacter::sneakOn);
+		EnhancedInputComponent->BindAction(SneakAction, ETriggerEvent::Completed, this, &AWPlayerCharacter::sneakOff);
 
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWPlayerCharacter::Interact);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AWPlayerCharacter::Interact);

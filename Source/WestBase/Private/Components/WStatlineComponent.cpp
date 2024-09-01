@@ -5,10 +5,14 @@
 
 void UWStatlineComponent::TickStats(const float& DeltaTime)
 {
-	Health.TickStat(DeltaTime);
 	TickStamina(DeltaTime);
-	Hunger.TickStat(DeltaTime);
-	Thirst.TickStat(DeltaTime);
+	TickHunger(DeltaTime);
+	TickThirst(DeltaTime);
+	if(Thirst.GetCurrent() <= 0.0 || Hunger.GetCurrent() <= 0.0)
+	{
+		return;
+	}
+	Health.TickStat(DeltaTime);
 }
 
 void UWStatlineComponent::TickStamina(const float& DeltaTime)
@@ -21,12 +25,11 @@ void UWStatlineComponent::TickStamina(const float& DeltaTime)
 	
 	if(bIsSprinting&&IsValidSprinting())
 	{
-		Stamina.TickStat(0-(DeltaTime*sprintCostMultiplier));
+		Stamina.TickStat(0-abs(DeltaTime*sprintCostMultiplier));
 		if(Stamina.GetCurrent() <= 0.0)
 		{
 			setSprinting(false);
 			currentStaminaExhaustion = secondsStaminaExhaustion;
-			
 		}
 		return;
 	}
@@ -34,29 +37,45 @@ void UWStatlineComponent::TickStamina(const float& DeltaTime)
 	Stamina.TickStat(DeltaTime);
 }
 
+void UWStatlineComponent::TickHunger(const float& DeltaTime)
+{
+	if(Hunger.GetCurrent()  <= 0.0)
+	{
+		Health.Adjust(0- abs(starveHealthDamagePerSecond * DeltaTime));
+		return;
+	}
+	Hunger.TickStat(DeltaTime);
+
+}
+
+void UWStatlineComponent::TickThirst(const float& DeltaTime)
+{
+	if(Thirst.GetCurrent() <= 0.0)
+	{
+		Health.Adjust(0- abs(dehydrateHealthDamagePerSecond* DeltaTime));
+		return;
+	}
+	Thirst.TickStat(DeltaTime);
+
+}
+
 bool UWStatlineComponent::IsValidSprinting()
 {
 	return owningCharMoveComp->Velocity.Length() > walkSpeed && !owningCharMoveComp->IsFalling();
 }
 
-// Sets default values for this component's properties
+
 UWStatlineComponent::UWStatlineComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
-// Called when the game starts
 void UWStatlineComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	owningCharMoveComp->MaxWalkSpeed = walkSpeed;
 }
 
-
-// Called every frame
 void UWStatlineComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -98,7 +117,23 @@ bool UWStatlineComponent::canSprint() const
 void UWStatlineComponent::setSprinting(const bool& IsSprinting)
 {
 	bIsSprinting = IsSprinting;
+	if(bIsSneaking && !bIsSprinting)
+	{
+		return;
+	}
+	bIsSneaking = false;
 	owningCharMoveComp->MaxWalkSpeed = bIsSprinting ? sprintSpeed : walkSpeed;
+}
+
+void UWStatlineComponent::setSneaking(const bool& IsSneaking)
+{
+	bIsSneaking = IsSneaking;
+	if(bIsSprinting && !bIsSneaking)
+	{
+		return;
+	}
+	bIsSprinting = false;
+	owningCharMoveComp->MaxWalkSpeed = bIsSneaking ? sneakSpead : walkSpeed;
 }
 
 bool UWStatlineComponent::canJump()

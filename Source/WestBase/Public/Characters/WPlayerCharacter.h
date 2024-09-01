@@ -41,6 +41,9 @@ private:
 	class UInputAction* SprintAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SneakAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -53,9 +56,10 @@ protected:
 	void Look(const FInputActionValue& Value);
 	
 	void playerJump();
-
 	void sprintOn();
 	void sprintOff();
+	void sneakOn();
+	void sneakOff();
 	
 	UFUNCTION(BlueprintCallable)
 	void Interact();

@@ -67,6 +67,11 @@ void AWestCharacter::setSprinting(const bool& IsSprinting)
 	Statline->setSprinting(IsSprinting);
 }
 
+void AWestCharacter::SetSneaking(const bool& isSneaking)
+{
+	Statline->setSneaking(isSneaking);
+}
+
 /*
 void AWestCharacter::OnSelectBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
